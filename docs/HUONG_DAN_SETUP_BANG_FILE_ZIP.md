@@ -1,132 +1,123 @@
-# Hướng Dẫn Triển Khai Thủ Công Bằng File ZIP (Manual Zip Setup Guide)
+# Hướng Dẫn Triển Khai Thủ Công Bằng Git (Public Repo Setup Guide)
 
 > **Cổng Thông Tin Điện Tử & Tuyển Sinh Trường Sĩ Quan Tăng Thiết Giáp**  
-> Bản hướng dẫn cài đặt từng bước (Step-by-Step) chuẩn Production dành riêng cho trường hợp sử dụng **Gói nén ZIP đóng gói sẵn (`siquantank_release.zip`)**, không sử dụng Git.
+> Bản hướng dẫn cài đặt từng bước (Step-by-Step) chuẩn Production dành riêng cho trường hợp triển khai bằng lệnh **Git Clone / Git Pull** từ Public Repository:  
+> 🔗 **https://github.com/iamnevir/siquantank.git**
 
 ---
 
-## 1. Thành Phần Trong Gói Nén ZIP
+## 1. Tổng Quan Kiến Trúc Khi Kéo Từ Git
 
-Gói nén đã tích hợp trọn vẹn toàn bộ hệ thống ở trạng thái sẵn sàng chạy Production:
-
-| Thành phần | Đường dẫn trong gói | Mô tả |
-| :--- | :--- | :--- |
-| **Mã nguồn Backend** | `backend/` | FastAPI REST API, SQLAlchemy Engine, các script vận hành |
-| **Cơ sở dữ liệu SQLite** | `backend/tank.db` | CSDL hoàn chỉnh 153 bài viết, điểm sàn, chuyên mục, tài khoản |
-| **Kho ảnh & Media Uploads** | `legacy_uploads/` | Toàn bộ ảnh bài viết và tài liệu kế thừa (~260MB) |
-| **Bản build Frontend Tĩnh** | `dist/` | React 18 + Vite + Tailwind đã build tối ưu cho Production |
-| **Cấu hình Docker & Nginx** | `docker/`, `docker-compose.yml`, `Dockerfile` | Kịch bản chạy Docker 2 container vi dịch vụ |
-| **Tài liệu hướng dẫn** | `docs/`, `README.md` | Bộ tài liệu kiến trúc, an toàn thông tin và cẩm nang vận hành |
+Khi bạn kéo mã nguồn từ Public Repository này:
+- ✅ **Bản build Frontend tĩnh (`dist/`):** Đã được biên dịch sẵn đầy đủ, **không cần cài đặt Node.js hay chạy npm install** trên server.
+- ✅ **Cơ sở dữ liệu SQLite (`backend/tank.db`):** Đã tích hợp đầy đủ 153 bài viết, điểm sàn, danh mục chuyên mục và tài khoản quản trị ban đầu.
+- ✅ **Giao diện đổi mật khẩu:** Đã tích hợp trực tiếp trên trang Admin CMS.
+- 📦 **Kho ảnh media uploads (`legacy_uploads/`):** Do tổng dung lượng ảnh ~260MB, file zip ảnh được lưu trữ an toàn tại mục **GitHub Releases** của repository để bạn tải về bằng lệnh `wget` nhanh nhất.
 
 ---
 
-## BƯỚC 1: Tải Và Giải Nén Gói ZIP Trên Server
+## BƯỚC 1: Clone Mã Nguồn Từ Git Về Server
 
-### 1.1. Di chuyển file ZIP lên thư mục cài đặt
-Giả sử bạn đã tải hoặc sao chép file `siquantank_release.zip` vào thư mục `/home/ubuntu`:
+Do repository là **Public**, bạn có thể tải mã nguồn về bất kỳ máy chủ nào mà không cần nhập mật khẩu hay cấu hình SSH Key:
 
 ```bash
-# Di chuyển đến thư mục cài đặt
+# 1. Di chuyển vào thư mục cài đặt mong muốn (ví dụ: /home/ubuntu)
 cd /home/ubuntu
 
-# Kiểm tra file nén đã có mặt
-ls -lh siquantank_release.zip
-```
+# 2. Clone mã nguồn dự án
+git clone https://github.com/iamnevir/siquantank.git
 
-### 1.2. Giải nén gói cài đặt
-```bash
-# Cài đặt unzip nếu server chưa có (Ubuntu/Debian)
-# sudo apt-get update && sudo apt-get install -y unzip
-
-# Giải nén gói release
-unzip -q siquantank_release.zip
-
-# Di chuyển vào thư mục dự án vừa giải nén
+# 3. Di chuyển vào thư mục dự án
 cd siquantank
 ```
 
-### 1.3. Kiểm tra kiểm chứng cấu trúc sau khi giải nén
-```bash
-# Kiểm tra các thư mục và file quan trọng
-ls -la
-
-# Đảm bảo CSDL SQLite đã có (~3.0 MB)
-ls -lh backend/tank.db
-
-# Đảm bảo kho media uploads đã có đủ các năm (2015 -> 2026)
-ls -la legacy_uploads/ | head -n 12
-
-# Đảm bảo bản build dist Frontend đã có đầy đủ
-ls -la dist/
-```
-
 ---
 
-## BƯỚC 2: Phân Quyền Thư Mục Dữ Liệu & Runtime
+## BƯỚC 2: Tải & Giải Nén Dữ Liệu Media Uploads
 
-Thiết lập quyền truy cập an toàn để container có thể đọc/ghi CSDL và tải lên các file media mới:
+Tải kho ảnh bài viết (`siquantank_uploads.zip` ~257MB) trực tiếp từ bản phát hành GitHub Release và giải nén vào `legacy_uploads/`:
 
 ```bash
 # Đảm bảo đang đứng trong thư mục siquantank
 cd /home/ubuntu/siquantank
 
-# 1. Tạo các thư mục runtime cho uploads mới và bản sao lưu tự động
+# 1. Tải kho ảnh từ GitHub Release
+wget https://github.com/iamnevir/siquantank/releases/download/v2.1.0/siquantank_uploads.zip
+
+# 2. Tạo thư mục legacy_uploads
+mkdir -p legacy_uploads
+
+# 3. Giải nén ảnh vào thư mục legacy_uploads
+unzip -q siquantank_uploads.zip -d legacy_uploads/
+
+# 4. Xóa file zip tải về để giải phóng dung lượng đĩa
+rm -f siquantank_uploads.zip
+```
+
+---
+
+## BƯỚC 3: Phân Quyền Thư Mục Dữ Liệu & Runtime
+
+Thiết lập phân quyền để các Docker Container có thể đọc/ghi CSDL và tải lên các file tài liệu, bài viết mới:
+
+```bash
+# Đảm bảo đang ở thư mục siquantank
+cd /home/ubuntu/siquantank
+
+# 1. Tạo thư mục chứa uploads mới và thư mục sao lưu cơ sở dữ liệu cho Backend
 mkdir -p backend/uploads backend/backups
 
-# 2. Phân quyền đọc/ghi dữ liệu
+# 2. Phân quyền đọc ghi an toàn
 chmod -R 755 legacy_uploads backend/uploads backend/backups
 chmod 664 backend/tank.db
 ```
 
 ---
 
-## BƯỚC 3: Khởi Chạy Hệ Thống Bằng Docker Compose
+## BƯỚC 4: Khởi Chạy Cụm Docker Production
 
-Vì bản tĩnh Frontend (`dist/`) và CSDL (`tank.db`) đã được chuẩn bị sẵn đầy đủ trong gói ZIP, cụm container sẽ tự động build và chạy ngay lập tức.
+Chạy toàn bộ cụm 2 container vi dịch vụ (`tank-backend` và `tank-frontend`) bằng Docker Compose:
 
-### 3.1. Build và khởi chạy các container Production
+### 4.1. Khởi chạy cụm container
 ```bash
-# Đứng tại thư mục chứa docker-compose.yml
-cd /home/ubuntu/siquantank
-
-# Khởi chạy cụm container ở chế độ chạy ngầm (detached mode)
+# Build và khởi chạy ở chế độ chạy ngầm
 docker compose up -d --build
 ```
 
-### 3.2. Kiểm tra trạng thái hoạt động & sức khỏe hệ thống
+### 4.2. Kiểm tra trạng thái hoạt động & sức khỏe hệ thống
 ```bash
-# 1. Kiểm tra 2 container đang chạy (tank-backend và tank-frontend)
+# 1. Kiểm tra 2 container đang chạy ở trạng thái Up và Healthy
 docker ps --filter "name=tank-"
 
-# 2. Xem logs khởi động của Backend (FastAPI / Uvicorn)
+# 2. Kiểm tra log khởi động Backend FastAPI
 docker logs --tail 30 tank-backend
 
-# 3. Xem logs của Frontend Nginx
+# 3. Kiểm tra log khởi động Frontend Nginx
 docker logs --tail 30 tank-frontend
 
-# 4. Chạy lệnh kiểm tra tính toàn vẹn CSDL và bài viết:
+# 4. Chạy kiểm tra tính toàn vẹn CSDL và kết nối:
 docker exec -it tank-backend python -m backend.system_ops check-health
 ```
-*Khi kết quả trả về `status: healthy` và `Database: OK` là hệ thống đã sẵn sàng 100%.*
+*Hệ thống báo `status: healthy` và `Database: OK` với 153 bài viết là hoàn tất.*
 
 ---
 
-## BƯỚC 4: Cấu Hình Nginx Host & Tên Miền (Domain)
+## BƯỚC 5: Cấu Hình Nginx Host & Tên Miền (Domain)
 
-Cấu hình Nginx trên Server Host làm Reverse Proxy chuyển tiếp cổng 80/443 vào cổng container `8082`.
+Tạo file cấu hình trên Nginx của máy chủ Host làm Reverse Proxy chuyển tiếp cổng 80/443 vào cổng container `8082`.
 
-### 4.1. Mở file cấu hình Nginx
+### 5.1. Mở file cấu hình Nginx
 ```bash
 sudo nano /etc/nginx/sites-available/siquantank.conf
 ```
 
-Chọn một trong 2 cấu hình mẫu dưới đây:
+Chọn một trong 2 cấu hình mẫu bên dưới:
 
 #### Cách A: Dành cho Tên Miền Riêng (Ví dụ: `tuyensinh.siquantank.edu.vn`)
 ```nginx
 server {
     listen 80;
-    server_name tuyensinh.siquantank.edu.vn; # Thay bằng tên miền thực tế
+    server_name tuyensinh.siquantank.edu.vn; # Thay bằng tên miền thực tế của bạn
 
     client_max_body_size 50M;
 
@@ -151,7 +142,7 @@ server {
 }
 ```
 
-#### Cách B: Chạy dưới tiền tố `/siquantank` (Dùng chung tên miền với dịch vụ khác)
+#### Cách B: Chạy dưới tiền tố `/siquantank` (Dùng chung tên miền với dịch vụ khác trên server)
 Thêm khối `location` này vào trong file cấu hình domain hiện có:
 ```nginx
 location = /siquantank {
@@ -171,23 +162,23 @@ location ^~ /siquantank/ {
 }
 ```
 
-### 4.2. Kích hoạt và tải lại Nginx
+### 5.2. Kích hoạt và tải lại Nginx
 ```bash
-# 1. Kích hoạt cấu hình site mới
+# 1. Kích hoạt site mới (nếu tạo file trong sites-available)
 sudo ln -sf /etc/nginx/sites-available/siquantank.conf /etc/nginx/sites-enabled/
 
-# 2. Kiểm tra cú pháp cấu hình Nginx
+# 2. Kiểm tra cú pháp Nginx
 sudo nginx -t
 
-# 3. Tải lại dịch vụ Nginx
+# 3. Nạp lại cấu hình Nginx
 sudo systemctl reload nginx
 ```
 
 ---
 
-## BƯỚC 5: Truy Cập Website & Đổi Mật Khẩu Quản Trị
+## BƯỚC 6: Truy Cập Website & Đổi Mật Khẩu Admin
 
-### 5.1. Địa chỉ truy cập
+### 6.1. Địa chỉ truy cập
 - **Cổng Thông Tin Công Khai:**
   - Nếu dùng Domain riêng (Cách A): `http://<your-domain>/siquantank/`
   - Nếu dùng tiền tố (Cách B): `http://<your-domain>/siquantank/`
@@ -197,21 +188,38 @@ sudo systemctl reload nginx
   - **Tên đăng nhập mặc định:** `admin`
   - **Mật khẩu mặc định:** `Tank@2026`
 
-### 5.2. Hướng dẫn đổi mật khẩu Admin trên giao diện Web:
-1. Đăng nhập vào trang quản trị bằng tài khoản `admin` / `Tank@2026`.
-2. Tại thanh điều hướng Sidebar bên trái (phía dưới thông tin tài khoản cán bộ), click vào nút **"Đổi mật khẩu"**.
-3. Nhập mật khẩu hiện tại (`Tank@2026`), mật khẩu mới (tối thiểu 6 ký tự) và xác nhận mật khẩu mới.
-4. Bấm **"Cập nhật mật khẩu"**. Hệ thống sẽ băm bảo mật SHA-256 kèm Salt và lưu ngay vào CSDL.
+### 6.2. Hướng dẫn đổi mật khẩu Admin trên giao diện Web:
+1. Đăng nhập vào trang quản trị CMS với tài khoản `admin` / `Tank@2026`.
+2. Tại thanh Sidebar bên trái (dưới tên cán bộ), click vào nút **"Đổi mật khẩu"**.
+3. Nhập mật khẩu hiện tại (`Tank@2026`), nhập mật khẩu mới và xác nhận.
+4. Bấm **"Cập nhật mật khẩu"**. Mật khẩu mới sẽ được cập nhật bảo mật ngay lập tức.
 
 ---
 
-## 6. Các Lệnh Vận Hành & Bảo Trì Nhanh Thường Dùng
+## BƯỚC 7: Cập Nhật Mã Nguồn Trong Tương Lai (Git Pull)
+
+Khi dự án có bản cập nhật mới trên GitHub, việc nâng cấp trên server rất nhanh chóng:
 
 ```bash
-# Khởi động lại cụm dịch vụ:
+# Di chuyển vào thư mục dự án
+cd /home/ubuntu/siquantank
+
+# Kéo mã nguồn mới nhất về
+git pull origin main
+
+# Khởi động lại cụm dịch vụ để nhận bản cập nhật mới
+docker compose restart
+```
+
+---
+
+## 8. Các Lệnh Vận Hành & Bảo Trì Nhanh
+
+```bash
+# Khởi động lại cụm container:
 docker compose restart
 
-# Dừng cụm dịch vụ:
+# Dừng cụm container:
 docker compose down
 
 # Sao lưu CSDL SQLite tức thời (1-Click Safe Backup):
