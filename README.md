@@ -211,6 +211,7 @@ docker logs -f tank-frontend
 ---
 
 ## Tài Liệu Tham Khảo Kỹ Thuật
-1. [Tài Liệu Kiến Trúc Hệ Thống (Architecture)](docs/KIEN_TRUC_HE_THONG_ARCHITECTURE.md)
-2. [Cẩm Nang Cài Đặt & Vận Hành Chi Tiết](docs/SYSTEM_SETUP.md)
-3. [Quy Chuẩn Thiết Kế Giao Diện UI/UX](docs/DESIGN.md)
+1. [Hướng Dẫn Triển Khai Bằng File ZIP (Không Dùng Git)](docs/HUONG_DAN_SETUP_BANG_FILE_ZIP.md)
+2. [Tài Liệu Kiến Trúc Hệ Thống (Architecture)](docs/KIEN_TRUC_HE_THONG_ARCHITECTURE.md)
+3. [Cẩm Nang Cài Đặt & Vận Hành Chi Tiết](docs/SYSTEM_SETUP.md)
+4. [Quy Chuẩn Thiết Kế Giao Diện UI/UX](docs/DESIGN.md)
