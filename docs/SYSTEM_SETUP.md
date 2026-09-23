@@ -7,7 +7,8 @@
 > [!NOTE]
 > Để xem chi tiết kỹ thuật sâu hơn, vui lòng tham khảo các tài liệu chuyên đề:
 > - **Kiến trúc hệ thống chi tiết:** [KIEN_TRUC_HE_THONG_ARCHITECTURE.md](file:///home/ubuntu/nevir/siquantank/docs/KIEN_TRUC_HE_THONG_ARCHITECTURE.md)
-> - **Chi tiết tính năng & nghiệp vụ quản lý:** [TINH_NANG_VA_CHI_TIET_QUAN_LY.md](file:///home/ubuntu/nevir/siquantank/docs/TINH_NANG_VA_CHI_TIET_QUAN_LY.md)
+> - **Chi tiết tính năng & nghiệp vụ quản lý:** [TINH_NANG_VA_CHI_TIET_QUAN_LY.docx](file:///home/ubuntu/nevir/siquantank/docs/TINH_NANG_VA_CHI_TIET_QUAN_LY.docx)
+> - **Quy chuẩn thiết kế UI/UX:** [DESIGN.md](file:///home/ubuntu/nevir/siquantank/docs/DESIGN.md)
 
 ---
 
@@ -162,26 +163,23 @@ Các lệnh này có thể chạy trực tiếp trên máy chủ hoặc qua cont
 
 ```bash
 # 1. Kiểm tra sức khỏe toàn diện CSDL, bài viết và hộp thư:
-python /home/ubuntu/nevir/siquantank/backend/agent_ops.py check-health
+python -m backend.system_ops check-health
 
 # Hoặc thực hiện bên trong container Docker:
-docker exec -it tank-backend python /app/backend/agent_ops.py check-health
+docker exec -it tank-backend python -m backend.system_ops check-health
 
 # 2. Tự động sao lưu CSDL có mốc thời gian:
-docker exec -it tank-backend python /app/backend/agent_ops.py backup-db
-
-# 3. Kích hoạt AI Agent tự động soạn thảo bài viết mới theo chủ đề:
-docker exec -it tank-backend python /app/backend/agent_ops.py auto-draft "Lễ tuyên thệ chiến sĩ mới năm 2026"
+docker exec -it tank-backend python -m backend.system_ops backup-db
 ```
 
 ### 5.2. Cấu hình Lịch Tự Động Hóa (Crontab)
-Để hệ thống tự động kiểm tra sức khỏe và sao lưu cơ sở dữ liệu hàng ngày lúc 02:00 sáng:
+Để hệ thống tự động sao lưu cơ sở dữ liệu hàng ngày lúc 02:00 sáng:
 ```bash
 # Mở crontab:
 crontab -e
 
 # Thêm dòng sau:
-0 2 * * * docker exec tank-backend python /app/backend/agent_ops.py backup-db >> /home/ubuntu/nevir/siquantank/backend/backups/cron.log 2>&1
+0 2 * * * docker exec tank-backend python -m backend.system_ops backup-db >> /home/ubuntu/nevir/siquantank/backend/backups/cron.log 2>&1
 ```
 
 ### 5.3. Quy trình Khôi phục Dữ liệu (Disaster Recovery)
