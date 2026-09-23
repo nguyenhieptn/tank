@@ -44,7 +44,7 @@ from backend.schemas import (
     CategoryCreate, CategoryUpdate, CategoryTreeOut, CategoryChildOut,
     AdmissionConfigOut, AdmissionConfigUpdate,
     InquiryCreate, InquiryOut,
-    LoginRequest, LoginResponse, SystemActionRequest, AgentActionRequest
+    LoginRequest, LoginResponse, ChangePasswordRequest, SystemActionRequest, AgentActionRequest
 )
 from backend.system_ops import (
     slugify, strip_html, backup_db, check_health, log_action
@@ -266,6 +266,41 @@ def get_current_user_profile(admin: AdminUser = Depends(get_current_admin)):
         "username": admin.username,
         "role": admin.role
     }
+
+@app.post("/api/auth/change-password")
+def change_password(
+    payload: ChangePasswordRequest,
+    admin: AdminUser = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    if not verify_password(payload.old_password, admin.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Mật khẩu hiện tại không chính xác."
+        )
+
+    if len(payload.new_password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Mật khẩu mới phải có tối thiểu 6 ký tự."
+        )
+
+    if payload.confirm_password and payload.new_password != payload.confirm_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Mật khẩu xác nhận không trùng khớp."
+        )
+
+    if verify_password(payload.new_password, admin.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Mật khẩu mới không được trùng với mật khẩu cũ."
+        )
+
+    admin.hashed_password = hash_pw(payload.new_password)
+    db.commit()
+    log_action("change_password", f"Quản trị viên '{admin.username}' đổi mật khẩu thành công.", "success")
+    return {"success": True, "message": "Đổi mật khẩu thành công!"}
 
 CATEGORY_SLUG_ALIASES = {
     "tin-tuc": "all",

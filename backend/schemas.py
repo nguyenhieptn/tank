@@ -173,3 +173,9 @@ class LoginResponse(BaseModel):
     token: str
     username: str
     role: str
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str
+    confirm_password: Optional[str] = None
+

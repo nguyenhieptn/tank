@@ -418,3 +418,21 @@ export async function adminUploadMedia(file: File) {
   }
   return await res.json();
 }
+
+export async function adminChangePassword(payload: {
+  old_password: string;
+  new_password: string;
+  confirm_password?: string;
+}) {
+  const res = await authFetch(`${API_BASE}/api/auth/change-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.detail || "Đổi mật khẩu không thành công.");
+  }
+  return data;
+}
+
