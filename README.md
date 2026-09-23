@@ -19,35 +19,31 @@
 ## BƯỚC 1: Cài Đặt Code Bằng Git & Đưa Dữ Liệu Upload Vào
 
 ### 1.1. Clone mã nguồn dự án
+Toàn bộ mã nguồn, cơ sở dữ liệu SQLite và kho ảnh `legacy_uploads/` đã được tích hợp sẵn trong repository:
+
 ```bash
 # Di chuyển đến thư mục muốn cài đặt (ví dụ: /home/ubuntu)
 cd /home/ubuntu
 
-# Clone mã nguồn từ Git
-git clone https://github.com/iamnevir/siquantank.git siquantank
+# Clone mã nguồn từ Git (qua SSH hoặc HTTPS)
+git clone git@github.com:nguyenhieptn/tank.git siquantank
+# Hoặc: git clone https://github.com/nguyenhieptn/tank.git siquantank
 
 # Di chuyển vào thư mục dự án
 cd siquantank
 ```
 
-### 1.2. Đưa dữ liệu upload vào hệ thống
-File dữ liệu media `siquantank_uploads.zip` (kho ảnh và tài liệu ~260MB) cần được giải nén vào thư mục `legacy_uploads/`:
+### 1.2. Phân quyền thư mục dữ liệu & CSDL
+Kho ảnh `legacy_uploads/` đã có sẵn khi clone. Chỉ cần tạo các thư mục runtime cho uploads mới và thiết lập quyền đọc/ghi:
 
 ```bash
 # Đảm bảo đang ở thư mục siquantank
 cd /home/ubuntu/siquantank
 
-# 1. Tạo thư mục chứa media upload
-mkdir -p legacy_uploads
-
-# 2. Giải nén file upload vào thư mục legacy_uploads
-# (Thay đường dẫn tới file siquantank_uploads.zip tương ứng)
-unzip -q /home/ubuntu/nevir/siquantank_uploads.zip -d legacy_uploads/
-
-# 3. Tạo thư mục lưu trữ media mới và sao lưu cơ sở dữ liệu cho Backend
+# 1. Tạo thư mục lưu trữ media mới và sao lưu cơ sở dữ liệu cho Backend
 mkdir -p backend/uploads backend/backups
 
-# 4. Phân quyền đọc/ghi cho thư mục dữ liệu và CSDL
+# 2. Phân quyền đọc/ghi cho thư mục dữ liệu và CSDL
 chmod -R 755 legacy_uploads backend/uploads backend/backups
 chmod 664 backend/tank.db
 ```

@@ -1,75 +1,67 @@
-# Hướng Dẫn Triển Khai Thủ Công Bằng Git (Public Repo Setup Guide)
+# Hướng Dẫn Triển Khai Thủ Công Bằng Git (Private Repository)
 
 > **Cổng Thông Tin Điện Tử & Tuyển Sinh Trường Sĩ Quan Tăng Thiết Giáp**  
-> Bản hướng dẫn cài đặt từng bước (Step-by-Step) chuẩn Production dành riêng cho trường hợp triển khai bằng lệnh **Git Clone / Git Pull** từ Public Repository:  
-> 🔗 **https://github.com/iamnevir/siquantank.git**
+> Bản hướng dẫn cài đặt từng bước (Step-by-Step) chuẩn Production dành riêng cho trường hợp triển khai từ Private Repository:  
+> 🔗 **https://github.com/nguyenhieptn/tank.git** (hoặc `git@github.com:nguyenhieptn/tank.git`)
 
 ---
 
-## 1. Tổng Quan Kiến Trúc Khi Kéo Từ Git
+## 1. Điểm Nổi Bật Của Bản Đóng Gói Trên Git
 
-Khi bạn kéo mã nguồn từ Public Repository này:
-- ✅ **Bản build Frontend tĩnh (`dist/`):** Đã được biên dịch sẵn đầy đủ, **không cần cài đặt Node.js hay chạy npm install** trên server.
-- ✅ **Cơ sở dữ liệu SQLite (`backend/tank.db`):** Đã tích hợp đầy đủ 153 bài viết, điểm sàn, danh mục chuyên mục và tài khoản quản trị ban đầu.
-- ✅ **Giao diện đổi mật khẩu:** Đã tích hợp trực tiếp trên trang Admin CMS.
-- 📦 **Kho ảnh media uploads (`legacy_uploads/`):** Do tổng dung lượng ảnh ~260MB, file zip ảnh được lưu trữ an toàn tại mục **GitHub Releases** của repository để bạn tải về bằng lệnh `wget` nhanh nhất.
+Toàn bộ hệ thống đã được tích hợp trọn vẹn trong một kho mã nguồn duy nhất:
+- ✅ **Đã bao gồm toàn bộ kho ảnh `legacy_uploads/`:** Tất cả hình ảnh bài viết và tài liệu từ 2015 đến 2026 đã được commit trực tiếp vào Git. **Không cần phải tải file zip hay giải nén ảnh thủ công!**
+- ✅ **Cơ sở dữ liệu SQLite (`backend/tank.db`):** Đã nạp đầy đủ 153 bài viết, điểm sàn, danh mục chuyên mục và tài khoản quản trị.
+- ✅ **Tính năng Đổi mật khẩu trên Web:** Đã tích hợp sẵn nút "Đổi mật khẩu" trực tiếp trên giao diện Admin CMS.
+- ✅ **Cụm Docker Compose vi dịch vụ:** Đã tối ưu sẵn sàng cho môi trường Production.
 
 ---
 
 ## BƯỚC 1: Clone Mã Nguồn Từ Git Về Server
 
-Do repository là **Public**, bạn có thể tải mã nguồn về bất kỳ máy chủ nào mà không cần nhập mật khẩu hay cấu hình SSH Key:
+Do đây là Private Repository, bạn clone bằng SSH (nếu server đã add SSH Key vào tài khoản GitHub) hoặc qua HTTPS kèm Personal Access Token (PAT):
 
 ```bash
 # 1. Di chuyển vào thư mục cài đặt mong muốn (ví dụ: /home/ubuntu)
 cd /home/ubuntu
 
-# 2. Clone mã nguồn dự án
-git clone https://github.com/iamnevir/siquantank.git
+# 2. Clone mã nguồn dự án (đã bao gồm đầy đủ mã nguồn, CSDL và toàn bộ kho ảnh legacy_uploads)
+# Cách A: Qua SSH (khuyên dùng):
+git clone git@github.com:nguyenhieptn/tank.git siquantank
 
-# 3. Di chuyển vào thư mục dự án
+# Cách B: Qua HTTPS:
+# git clone https://github.com/nguyenhieptn/tank.git siquantank
+
+# 3. Di chuyển vào thư mục dự án vừa clone
 cd siquantank
 ```
 
 ---
 
-## BƯỚC 2: Tải & Giải Nén Dữ Liệu Media Uploads
+## BƯỚC 2: Phân Quyền Thư Mục Dữ Liệu & Runtime
 
-Tải kho ảnh bài viết (`siquantank_uploads.zip` ~257MB) trực tiếp từ bản phát hành GitHub Release và giải nén vào `legacy_uploads/`:
-
-```bash
-# Đảm bảo đang đứng trong thư mục siquantank
-cd /home/ubuntu/siquantank
-
-# 1. Tải kho ảnh từ GitHub Release
-wget https://github.com/iamnevir/siquantank/releases/download/v2.1.0/siquantank_uploads.zip
-
-# 2. Tạo thư mục legacy_uploads
-mkdir -p legacy_uploads
-
-# 3. Giải nén ảnh vào thư mục legacy_uploads
-unzip -q siquantank_uploads.zip -d legacy_uploads/
-
-# 4. Xóa file zip tải về để giải phóng dung lượng đĩa
-rm -f siquantank_uploads.zip
-```
-
----
-
-## BƯỚC 3: Phân Quyền Thư Mục Dữ Liệu & Runtime
-
-Thiết lập phân quyền để các Docker Container có thể đọc/ghi CSDL và tải lên các file tài liệu, bài viết mới:
+Thiết lập quyền truy cập an toàn để container có thể đọc/ghi CSDL và tải lên các file media mới:
 
 ```bash
 # Đảm bảo đang ở thư mục siquantank
 cd /home/ubuntu/siquantank
 
-# 1. Tạo thư mục chứa uploads mới và thư mục sao lưu cơ sở dữ liệu cho Backend
+# 1. Tạo thư mục chứa media mới và thư mục sao lưu cơ sở dữ liệu cho Backend
 mkdir -p backend/uploads backend/backups
 
-# 2. Phân quyền đọc ghi an toàn
+# 2. Phân quyền đọc/ghi an toàn
 chmod -R 755 legacy_uploads backend/uploads backend/backups
 chmod 664 backend/tank.db
+```
+
+---
+
+## BƯỚC 3: Cài Đặt Dependencies & Build Frontend (Nếu Cần)
+
+Nếu server của bạn có sẵn Node.js và muốn build lại bản tĩnh:
+```bash
+# Cài đặt thư viện và build bản tĩnh production
+npm install
+npm run build
 ```
 
 ---
@@ -176,7 +168,7 @@ sudo systemctl reload nginx
 
 ---
 
-## BƯỚC 6: Truy Cập Website & Đổi Mật Khẩu Admin
+## BƯỚC 6: Truy Cập Website & Đổi Mật Khẩu Admin Trên Web
 
 ### 6.1. Địa chỉ truy cập
 - **Cổng Thông Tin Công Khai:**
@@ -198,22 +190,22 @@ sudo systemctl reload nginx
 
 ## BƯỚC 7: Cập Nhật Mã Nguồn Trong Tương Lai (Git Pull)
 
-Khi dự án có bản cập nhật mới trên GitHub, việc nâng cấp trên server rất nhanh chóng:
+Khi có bản cập nhật mới trên GitHub, việc nâng cấp trên server chỉ mất vài giây:
 
 ```bash
 # Di chuyển vào thư mục dự án
 cd /home/ubuntu/siquantank
 
-# Kéo mã nguồn mới nhất về
+# Kéo bản cập nhật mới nhất về
 git pull origin main
 
-# Khởi động lại cụm dịch vụ để nhận bản cập nhật mới
+# Khởi động lại cụm dịch vụ
 docker compose restart
 ```
 
 ---
 
-## 8. Các Lệnh Vận Hành & Bảo Trì Nhanh
+## 8. Các Lệnh Vận Hành & Bảo Trì Nhanh Thường Dùng
 
 ```bash
 # Khởi động lại cụm container:

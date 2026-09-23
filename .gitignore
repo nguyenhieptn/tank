@@ -24,7 +24,6 @@ dist-ssr
 *.sw?
 
 # Media & Database Backups
-legacy_uploads/
 backend/backups/
 backend/uploads/
 backend/__pycache__/
