@@ -1,0 +1,55 @@
+services:
+  tank-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: siquantank-backend:latest
+    container_name: tank-backend
+    restart: always
+    ports:
+      - "127.0.0.1:8086:8000"
+    volumes:
+      - ./backend/main.py:/app/backend/main.py
+      - ./backend/models.py:/app/backend/models.py
+      - ./backend/schemas.py:/app/backend/schemas.py
+      - ./backend/system_ops.py:/app/backend/system_ops.py
+      - ./backend/agent_ops.py:/app/backend/agent_ops.py
+      - ./backend/tank.db:/app/backend/tank.db
+      - ./backend/backups:/app/backend/backups
+      - ./backend/uploads:/app/backend/uploads
+      - ./legacy_uploads:/app/uploads:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      - JWT_SECRET_KEY=siquantank-secret-2026-tgh-defense-cms-key-secure
+      - PASSWORD_SALT=siquantank_salt_defense_2026_qnd
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/admissions')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - tank-net
+
+  tank-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: siquantank-frontend:latest
+    container_name: tank-frontend
+    restart: always
+    ports:
+      - "0.0.0.0:8082:8082"
+    volumes:
+      - ./dist:/usr/share/nginx/html/siquantank:ro
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      tank-backend:
+        condition: service_healthy
+    networks:
+      - tank-net
+
+networks:
+  tank-net:
+    name: siquantank-network
+    driver: bridge

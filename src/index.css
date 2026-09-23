@@ -1,0 +1,529 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Merriweather:wght@700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Trường Sĩ quan Tăng thiết giáp — Vietnam Military Design System
+   Palette: Dark Army Green (Vietnam People's Army), Gold star accent, Crimson red flag.
+   All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Surfaces */
+    --background: 90 18% 96%;
+    --foreground: 95 35% 8%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 95 35% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 95 35% 10%;
+
+    /* Brand: Dark VN Army Green */
+    --primary: 95 38% 14%;
+    --primary-foreground: 48 80% 92%;
+    --primary-glow: 95 30% 26%;
+
+    /* Gold star */
+    --accent: 45 88% 52%;
+    --accent-foreground: 95 38% 12%;
+
+    /* Flag red */
+    --destructive: 0 75% 42%;
+    --destructive-foreground: 0 0% 100%;
+
+    --secondary: 90 15% 90%;
+    --secondary-foreground: 95 38% 14%;
+
+    --muted: 90 12% 92%;
+    --muted-foreground: 95 10% 35%;
+
+    --border: 90 12% 82%;
+    --input: 90 12% 85%;
+    --ring: 95 38% 14%;
+
+    --radius: 0.25rem;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(95 45% 8%) 0%, hsl(95 38% 14%) 50%, hsl(95 30% 22%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(45 90% 55%) 0%, hsl(38 85% 45%) 100%);
+    --gradient-overlay: linear-gradient(180deg, hsl(95 45% 8% / 0.3) 0%, hsl(95 45% 8% / 0.95) 100%);
+
+    /* Shadows */
+    --shadow-command: 0 20px 50px -15px hsl(95 45% 8% / 0.5);
+    --shadow-card: 0 4px 20px -8px hsl(95 38% 14% / 0.25);
+    --shadow-gold: 0 8px 30px -10px hsl(45 88% 52% / 0.5);
+
+    --sidebar-background: 95 38% 14%;
+    --sidebar-foreground: 48 80% 92%;
+    --sidebar-primary: 45 88% 52%;
+    --sidebar-primary-foreground: 95 38% 14%;
+    --sidebar-accent: 95 30% 22%;
+    --sidebar-accent-foreground: 48 80% 92%;
+    --sidebar-border: 95 30% 22%;
+    --sidebar-ring: 45 88% 52%;
+  }
+
+  .dark {
+    --background: 95 40% 6%;
+    --foreground: 48 30% 92%;
+
+    --card: 95 38% 10%;
+    --card-foreground: 48 30% 92%;
+
+    --popover: 95 38% 10%;
+    --popover-foreground: 48 30% 92%;
+
+    --primary: 45 88% 52%;
+    --primary-foreground: 95 45% 8%;
+    --primary-glow: 45 90% 65%;
+
+    --accent: 45 88% 52%;
+    --accent-foreground: 95 45% 8%;
+
+    --secondary: 95 30% 14%;
+    --secondary-foreground: 48 30% 92%;
+
+    --muted: 95 25% 12%;
+    --muted-foreground: 48 15% 70%;
+
+    --destructive: 0 75% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 95 25% 18%;
+    --input: 95 25% 18%;
+    --ring: 45 88% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .font-display {
+    font-family: 'Merriweather', 'Be Vietnam Pro', Georgia, serif;
+    font-weight: 900;
+    letter-spacing: -0.005em;
+  }
+}
+
+@layer utilities {
+  .bg-hero-gradient {
+    background: var(--gradient-hero);
+  }
+  .bg-gold-gradient {
+    background: var(--gradient-gold);
+  }
+  .shadow-command {
+    box-shadow: var(--shadow-command);
+  }
+  .shadow-card-soft {
+    box-shadow: var(--shadow-card);
+  }
+  .shadow-gold {
+    box-shadow: var(--shadow-gold);
+  }
+  .text-stroke-gold {
+    -webkit-text-stroke: 1px hsl(var(--accent));
+    color: transparent;
+  }
+  .pattern-camo {
+    background-image:
+      radial-gradient(hsl(var(--primary) / 0.08) 1px, transparent 1px),
+      radial-gradient(hsl(var(--accent) / 0.05) 1px, transparent 1px);
+    background-size: 24px 24px, 24px 24px;
+    background-position: 0 0, 12px 12px;
+  }
+  .pattern-tactical {
+    background-image: linear-gradient(hsl(var(--accent) / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--accent) / 0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
+/* =========================================================
+   WordPress Gutenberg Content & Article Formatting Styles
+   ========================================================= */
+
+.prose {
+  color: hsl(var(--foreground));
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.prose p {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.prose strong {
+  color: hsl(var(--foreground));
+  font-weight: 700;
+}
+
+.prose a {
+  color: hsl(var(--destructive));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.prose a:hover {
+  color: hsl(var(--primary));
+}
+
+/* Document & Admissions Download Buttons */
+.prose a[href*=".pdf"],
+.prose a[href*=".doc"],
+.prose a[href*=".docx"],
+.prose a[href*=".xls"],
+.prose a[href*=".xlsx"],
+.prose a[href*="drive.google.com"],
+.prose a[href*="docs.google.com"],
+.prose a.wp-block-file__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1.15rem;
+  margin: 0.4rem 0.25rem;
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground)) !important;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  text-decoration: none !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.prose a[href*=".pdf"]:hover,
+.prose a[href*=".doc"]:hover,
+.prose a[href*=".docx"]:hover,
+.prose a[href*=".xls"]:hover,
+.prose a[href*=".xlsx"]:hover,
+.prose a[href*="drive.google.com"]:hover,
+.prose a[href*="docs.google.com"]:hover,
+.prose a.wp-block-file__button:hover {
+  background-color: hsl(var(--primary-glow));
+  color: hsl(var(--accent)) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.prose a[href*=".pdf"]::before,
+.prose a[href*=".doc"]::before,
+.prose a[href*=".docx"]::before,
+.prose a[href*="drive.google.com"]::before,
+.prose a[href*="docs.google.com"]::before {
+  content: "📥";
+  font-size: 0.95rem;
+}
+
+/* Alignment utilities */
+.has-text-align-center, .aligncenter {
+  text-align: center !important;
+}
+.has-text-align-right, .alignright {
+  text-align: right !important;
+}
+.has-text-align-left, .alignleft {
+  text-align: left !important;
+}
+
+/* WP Block Image */
+.wp-block-image, figure.wp-block-image {
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.wp-block-image img, figure.wp-block-image img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+  border: 1px solid hsl(var(--border));
+}
+
+.wp-block-image figcaption, .wp-element-caption {
+  margin-top: 0.65rem;
+  font-size: 0.875rem;
+  font-style: italic;
+  color: hsl(var(--muted-foreground));
+  text-align: center;
+}
+
+/* WP Block Gallery */
+.wp-block-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: stretch;
+  gap: 1.25rem;
+  margin: 2rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wp-block-gallery figure, .wp-block-gallery .wp-block-image {
+  margin: 0 !important;
+  height: 280px;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--muted));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wp-block-gallery img, .wp-block-gallery .wp-block-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.wp-block-gallery figure:hover img, .wp-block-gallery .wp-block-image:hover img {
+  transform: scale(1.04);
+}
+
+/* WP Block File & Downloadable PDF Embeds */
+.wp-block-file {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  margin: 2rem 0;
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-left: 4px solid hsl(var(--primary));
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
+}
+
+.wp-block-file__embed {
+  width: 100%;
+  min-height: 520px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  background: hsl(var(--muted) / 0.5);
+}
+
+.wp-block-file a:not(.wp-block-file__button) {
+  font-weight: 700;
+  font-size: 1rem;
+  color: hsl(var(--primary));
+  text-decoration: none;
+  flex: 1;
+  min-width: 200px;
+}
+
+.wp-block-file a:not(.wp-block-file__button):hover {
+  text-decoration: underline;
+}
+
+.wp-block-file__button, .wp-element-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground)) !important;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 0.375rem;
+  text-decoration: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.wp-block-file__button:hover, .wp-element-button:hover {
+  background-color: hsl(var(--primary-glow));
+  transform: translateY(-1px);
+}
+
+/* WP Block Table */
+.wp-block-table {
+  overflow-x: auto;
+  margin: 2rem 0;
+  border-radius: 0.5rem;
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.04);
+}
+
+.wp-block-table table, .prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  text-align: left;
+}
+
+.wp-block-table th, .prose table th {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--primary));
+  font-weight: 800;
+  padding: 0.85rem 1.25rem;
+  border: 1px solid hsl(var(--border));
+  font-size: 0.925rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.wp-block-table td, .prose table td {
+  padding: 0.85rem 1.25rem;
+  border: 1px solid hsl(var(--border));
+  font-size: 0.95rem;
+}
+
+.wp-block-table tr:nth-child(even), .prose table tr:nth-child(even) {
+  background-color: hsl(var(--muted) / 0.25);
+}
+
+/* WP Details Block */
+.wp-block-details, details {
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  background-color: hsl(var(--card));
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.wp-block-details summary, details summary {
+  font-weight: 700;
+  cursor: pointer;
+  color: hsl(var(--primary));
+  outline: none;
+  user-select: none;
+  padding: 0.25rem 0;
+}
+
+.wp-block-details summary:hover, details summary:hover {
+  color: hsl(var(--destructive));
+}
+
+/* Lists styling */
+.wp-block-list, .prose ul, .prose ol {
+  margin: 1.25rem 0;
+  padding-left: 1.75rem;
+}
+
+.wp-block-list li, .prose li {
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+/* TipTap WYSIWYG Editor Styles */
+.tiptap-editor-body .ProseMirror {
+  outline: none;
+  min-height: 380px;
+}
+
+.tiptap-editor-body .ProseMirror p {
+  margin-bottom: 0.85rem;
+  line-height: 1.75;
+}
+
+.tiptap-editor-body .ProseMirror h2 {
+  font-family: 'Merriweather', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: hsl(var(--primary));
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid hsl(var(--border) / 0.6);
+  padding-bottom: 0.35rem;
+}
+
+.tiptap-editor-body .ProseMirror h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.tiptap-editor-body .ProseMirror h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.tiptap-editor-body .ProseMirror blockquote {
+  border-left: 4px solid hsl(var(--destructive));
+  padding: 0.6rem 1rem;
+  font-style: italic;
+  background-color: hsl(var(--muted) / 0.3);
+  border-radius: 0 0.375rem 0.375rem 0;
+  margin: 1rem 0;
+}
+
+.tiptap-editor-body .ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.tiptap-editor-body .ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.tiptap-editor-body .ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  border: 1px solid hsl(var(--border));
+}
+
+.tiptap-editor-body .ProseMirror th,
+.tiptap-editor-body .ProseMirror td {
+  border: 1px solid hsl(var(--border));
+  padding: 8px 12px;
+  vertical-align: top;
+}
+
+.tiptap-editor-body .ProseMirror th {
+  background-color: hsl(var(--muted) / 0.5);
+  font-weight: 600;
+}
+
+.tiptap-editor-body .ProseMirror .selectedCell:after {
+  background: rgba(200, 200, 255, 0.4);
+  content: "";
+  left: 0; right: 0; top: 0; bottom: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+.tiptap-editor-body .ProseMirror hr {
+  border: none;
+  border-top: 2px dashed hsl(var(--border));
+  margin: 1.5rem 0;
+}
+
+
